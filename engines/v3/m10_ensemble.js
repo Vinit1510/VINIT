@@ -59,11 +59,27 @@ function ensemble(allResults, features, history, weights) {
   const totalVotesPower = bigVotes + smallVotes;
   const voteStrength = totalVotesPower > 0 ? Math.max(bigVotes, smallVotes) / totalVotesPower : 0.5;
 
-  const weightedConf = active.reduce((sum, r) => sum + r.confidence * (weights.get(r.method) || 1), 0)
-    / active.reduce((sum, r) => sum + (weights.get(r.method) || 1), 0);
+  // Consensus Optimization: Focus weighted confidence only on the winning majority side!
+  const winningActive = active.filter((r) => r.size === majoritySize);
+  const weightedConf = winningActive.length > 0
+    ? winningActive.reduce((sum, r) => sum + r.confidence * (weights.get(r.method) || 1), 0)
+      / winningActive.reduce((sum, r) => sum + (weights.get(r.method) || 1), 0)
+    : 35;
     
-  // Base confidence is the weighted confidence. Boosted slightly by vote strength.
-  const confidence = Math.min(92, Math.round(weightedConf * 0.7 + voteStrength * 30));
+  // Base confidence calculation
+  let confidence = Math.round(weightedConf * 0.6 + voteStrength * 40);
+
+  // CONSENSUS ACCELERATOR: Boost confidence aggressively when models strongly agree!
+  if (voteStrength >= 0.85) {
+    confidence = Math.round(confidence * 1.35); // 35% boost for extreme consensus
+  } else if (voteStrength >= 0.75) {
+    confidence = Math.round(confidence * 1.20); // 20% boost for high consensus
+  } else if (voteStrength >= 0.65) {
+    confidence = Math.round(confidence * 1.10); // 10% boost for moderate consensus
+  }
+
+  // Cap between 10% and 95%
+  confidence = Math.max(10, Math.min(95, confidence));
 
   let color = "GREEN";
   if (finalNum === 0) color = "RED_VIOLET";
