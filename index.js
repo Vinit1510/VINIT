@@ -15,10 +15,10 @@ const { runAllMethods } = require("./core/engine_loader");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ─── State ────────────────────────────────────────────────────
+// ─── State (Cooldown Removed) ─────────────────────────────────
 const state = {
-  "1M": { lastPred: null, lastId: null, lastFetchedAt: null, cooldown: 0 },
-  "30S": { lastPred: null, lastId: null, lastFetchedAt: null, cooldown: 0 },
+  "1M": { lastPred: null, lastId: null, lastFetchedAt: null },
+  "30S": { lastPred: null, lastId: null, lastFetchedAt: null },
 };
 
 // ─── Method Weights (persisted in PostgreSQL) ─────────────────
@@ -90,10 +90,20 @@ const ENDPOINTS = {
   "1M": "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json",
   "30S": "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json",
 };
+
+// Extremely stealthy headers to prevent API blocks
 const FETCH_HEADERS = {
-  accept: "application/json",
-  referer: "https://jalwaapp2.com/",
-  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "accept": "application/json, text/plain, */*",
+  "accept-language": "en-US,en;q=0.9,hi;q=0.8",
+  "referer": "https://jalwaapp2.com/",
+  "origin": "https://jalwaapp2.com",
+  "sec-ch-ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
+  "sec-ch-ua-mobile": "?1",
+  "sec-ch-ua-platform": '"Android"',
+  "sec-fetch-dest": "empty",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-site": "cross-site",
+  "user-agent": "Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36"
 };
 
 // ─── Mining Loop ──────────────────────────────────────────────
@@ -101,7 +111,12 @@ async function mineLoop(gameType) {
   try {
     const url = `${ENDPOINTS[gameType]}?ts=${Date.now()}`;
     const res = await fetch(url, { headers: FETCH_HEADERS, signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return;
+    
+    if (!res.ok) {
+      console.log(`[${gameType}] API BLOCKED! Status: ${res.status} ${res.statusText}`);
+      return;
+    }
+    
     const json = await res.json();
     const history = json.data.list;
     if (!history || history.length < 3) return;
@@ -122,10 +137,9 @@ async function mineLoop(gameType) {
       const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
       const actualColor = getColor(actualNum);
 
-      const isSkip = gs.lastPred.confidence === 0;
-      const numWin = isSkip ? "SKIP" : (actualNum === gs.lastPred.n ? "WIN" : "LOSS");
-      const sizeWin = isSkip ? "SKIP" : (actualSize === gs.lastPred.sz ? "WIN" : "LOSS");
-      const colorWin = isSkip ? "SKIP" : (
+      const numWin = (actualNum === gs.lastPred.n ? "WIN" : "LOSS");
+      const sizeWin = (actualSize === gs.lastPred.sz ? "WIN" : "LOSS");
+      const colorWin = (
         actualColor === gs.lastPred.col ||
           (actualColor.includes("RED") && gs.lastPred.col.includes("RED")) ||
           (actualColor.includes("GREEN") && gs.lastPred.col.includes("GREEN"))
@@ -135,12 +149,6 @@ async function mineLoop(gameType) {
       // Update method weights in database
       if (gs.lastPred.allMethods) {
         await updateWeights(gs.lastPred.allMethods, actualSize, actualNum);
-      }
-
-      // COOLDOWN TRIGGER: If we just lost a HIGH confidence bet, pattern broke. Go to sleep for 3 rounds.
-      if (gs.lastPred.confidence >= 65 && sizeWin === "LOSS") {
-        gs.cooldown = 3;
-        console.log(`[${gameType}] HIGH CONFIDENCE FAILURE DETECTED. Entering 3-round COOLDOWN.`);
       }
 
       // Insert into database
@@ -166,17 +174,12 @@ async function mineLoop(gameType) {
     const source = features.totalRows >= 100 ? "NEURAL" : "STATISTICAL";
     const nextId = String(BigInt(latest.issueNumber) + 1n);
 
+    // Predict without cooldowns
     let final, allResults = [];
-    if (gs.cooldown > 0) {
-      gs.cooldown--;
-      final = { number: 5, size: "BIG", color: "GREEN_VIOLET", confidence: 0, method: "COOLDOWN_ACTIVE" };
-      allResults = [final];
-    } else {
-      const weights = getWeightMap();
-      const res = runAllMethods(features, dbHistory, weights);
-      allResults = res.allResults;
-      final = res.final;
-    }
+    const weights = getWeightMap();
+    const resData = runAllMethods(features, dbHistory, weights);
+    allResults = resData.allResults;
+    final = resData.final;
 
     gs.lastPred = {
       n: final.number, sz: final.size, col: final.color,
@@ -277,14 +280,12 @@ app.get("/api/stats", async (req, res) => {
   }
 });
 
-// Reset AI Memory (Weights) without deleting mined history
 app.post("/api/reset_weights", async (req, res) => {
   await pool.query("DELETE FROM method_weights");
   methodWeights.clear();
   res.json({ ok: true, message: "AI Memory Wiped. Learning from scratch." });
 });
 
-// Clear data
 app.delete("/api/clear/:mode", async (req, res) => {
   const mode = req.params.mode === "30S" ? "30S" : "1M";
   await pool.query("DELETE FROM predictions WHERE game_type = $1", [mode]);
@@ -296,7 +297,6 @@ app.delete("/api/clear/:mode", async (req, res) => {
   res.json({ ok: true, message: `Cleared ${mode} data` });
 });
 
-// Clear all random predictions
 app.post("/api/clear_randomizer", async (req, res) => {
   try {
     await pool.query("DELETE FROM rand_predictions");
@@ -306,14 +306,12 @@ app.post("/api/clear_randomizer", async (req, res) => {
   }
 });
 
-// Store a random prediction for a specific period
 app.post("/api/rand_predict", async (req, res) => {
   try {
     const { gameType, periodId, randNum, randSize, randColor } = req.body;
     if (!gameType || !periodId || randNum === undefined) {
       return res.status(400).json({ error: "Missing fields" });
     }
-    // INSERT ... ON CONFLICT DO NOTHING so we only store the FIRST prediction per period
     await pool.query(
       `INSERT INTO rand_predictions (game_type, period_id, rand_num, rand_size, rand_color)
        VALUES ($1, $2, $3, $4, $5)
@@ -326,7 +324,6 @@ app.post("/api/rand_predict", async (req, res) => {
   }
 });
 
-// Get randomizer stats & recent results for comparison
 app.get("/api/rand_stats", async (req, res) => {
   try {
     const game = req.query.game === "30S" ? "30S" : "1M";
@@ -334,13 +331,11 @@ app.get("/api/rand_stats", async (req, res) => {
     const targetId = gs && gs.lastPred ? gs.lastPred.targetId : null;
 
     if (targetId) {
-      // Check if a random prediction already exists for this active target period
       const checkRes = await pool.query(
         "SELECT id FROM rand_predictions WHERE game_type = $1 AND period_id = $2",
         [game, targetId]
       );
       if (checkRes.rows.length === 0) {
-        // Auto-generate one on the fly!
         const randNum = Math.floor(Math.random() * 10);
         const randSize = randNum >= 5 ? "BIG" : "SMALL";
         const randGetColor = (n) => {
@@ -360,7 +355,6 @@ app.get("/api/rand_stats", async (req, res) => {
       }
     }
 
-    // Join rand_predictions with actual predictions to fill in results
     const result = await pool.query(
       `SELECT r.period_id, r.rand_num, r.rand_size, r.rand_color,
               p.actual_num, p.actual_size, p.actual_color,
@@ -388,7 +382,6 @@ app.get("/api/rand_stats", async (req, res) => {
     const rows = result.rows;
     const played = rows.filter(r => r.size_win !== 'PENDING');
 
-    // High-performance database-wide all-time aggregation query
     const allStatsResult = await pool.query(
       `SELECT 
          COUNT(*) FILTER (WHERE p.actual_size IS NOT NULL) as total_played,
@@ -411,25 +404,22 @@ app.get("/api/rand_stats", async (req, res) => {
     const dbSizeWins = parseInt(allStatsResult.rows[0]?.size_wins || 0);
     const dbColorWins = parseInt(allStatsResult.rows[0]?.color_wins || 0);
 
-    // Last 15 played rounds calculations
     const last15 = played.slice(0, 15);
     const sizeWins15 = last15.filter(r => r.size_win === 'WIN').length;
     const colorWins15 = last15.filter(r => r.color_win === 'WIN').length;
 
-    // Last 30 played rounds calculations
     const last30 = played.slice(0, 30);
     const sizeWins30 = last30.filter(r => r.size_win === 'WIN').length;
     const colorWins30 = last30.filter(r => r.color_win === 'WIN').length;
 
-    // Streaks calculation (oldest to newest, so we reverse the played array)
     const chronological = [...played].reverse();
-    let currentStreakType = "NONE"; // "WIN" or "LOSS"
+    let currentStreakType = "NONE"; 
     let currentStreakCount = 0;
     let maxWinStreak = 0;
     let maxLossStreak = 0;
 
     for (const r of chronological) {
-      const outcome = r.size_win; // 'WIN' or 'LOSS'
+      const outcome = r.size_win;
       if (outcome === 'WIN') {
         if (currentStreakType === 'WIN') {
           currentStreakCount++;
@@ -478,7 +468,6 @@ app.get("/api/rand_stats", async (req, res) => {
   }
 });
 
-// Download CSV (export from database)
 app.get("/data", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM predictions ORDER BY id ASC");
@@ -499,7 +488,6 @@ app.get("/data", async (req, res) => {
   }
 });
 
-// Download Randomizer CSV (export from database)
 app.get("/rand_data", async (req, res) => {
   try {
     const result = await pool.query(
@@ -538,7 +526,6 @@ app.get("/rand_data", async (req, res) => {
   }
 });
 
-// Health check (for UptimeRobot)
 app.get("/health", (req, res) => res.json({ status: "alive", uptime: process.uptime() }));
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -552,10 +539,10 @@ async function computeRolling(game, minutes) {
     const rows = res.rows;
     const playedRows = rows.filter(r => r.size_win !== 'SKIP');
     const total = playedRows.length;
-    if (total === 0) return { rounds: rows.length, sizeWin: 0, numWin: 0, colorWin: 0 }; // Still show total mined rounds, but 0% win if none played
+    if (total === 0) return { rounds: rows.length, sizeWin: 0, numWin: 0, colorWin: 0 }; 
 
     return {
-      rounds: total, // Show how many were actually PLAYED
+      rounds: total, 
       sizeWin: Math.round((playedRows.filter((r) => r.size_win === "WIN").length / total) * 100),
       numWin: Math.round((playedRows.filter((r) => r.num_win === "WIN").length / total) * 100),
       colorWin: Math.round((playedRows.filter((r) => r.color_win === "WIN").length / total) * 100),
@@ -587,7 +574,7 @@ async function computeSureShots(game) {
 function computeHourly(rows) {
   const groups = {};
   for (const r of rows) {
-    if (r.size_win === "SKIP") continue; // Exclude skipped rounds from hourly average entirely
+    if (r.size_win === "SKIP") continue; 
 
     const key = `${r.date_ist}|${r.hour_ist}`;
     if (!groups[key]) groups[key] = { date: r.date_ist, hour: r.hour_ist, total: 0, sizeW: 0, numW: 0, colorW: 0 };
@@ -622,7 +609,6 @@ async function start() {
     console.log(`║   Storage: PostgreSQL ✅                  ║`);
     console.log(`╚══════════════════════════════════════════╝\n`);
 
-    // Start mining loops
     mineLoop("1M");
     mineLoop("30S");
     setInterval(() => mineLoop("1M"), 9000);
