@@ -1,26 +1,42 @@
 /**
- * Method 2: Streak Reversal (Mean Reversion)
- * If 3+ consecutive same Size results, predict the OPPOSITE.
+ * CORTEX V3 - Method 02v2: Exponential Reversal
+ * Triggers massive confidence when the 10-round ratio hits extremes.
  */
 function predict(features, history) {
-  const { currentStreakLen, currentStreakDir, bigSmallRatio10, last10nums, gapAnalysis } = features;
-  let targetSize, confidence;
+  const ratio = features.bigSmallRatio10;
+  
+  let targetSize = "BIG";
+  let targetNumber = 5;
+  let targetColor = "GREEN_VIOLET";
+  let conf = 0;
 
-  if (currentStreakLen >= 3 && currentStreakDir !== "NONE") {
-    targetSize = currentStreakDir === "BIG" ? "SMALL" : "BIG";
-    confidence = Math.min(85, 40 + currentStreakLen * 8);
-  } else {
-    targetSize = bigSmallRatio10 > 0.5 ? "SMALL" : "BIG";
-    confidence = Math.round(25 + Math.abs(bigSmallRatio10 - 0.5) * 60);
+  // Extreme Small Imbalance (Force BIG)
+  if (ratio <= 0.3) {
+    targetSize = "BIG";
+    targetNumber = ratio <= 0.2 ? 8 : 7; // 8 for max emergency, 7 for standard reversal
+    targetColor = targetNumber === 8 ? "RED" : "GREEN";
+    conf = ratio <= 0.2 ? 95 : 85; 
+  }
+  // Extreme Big Imbalance (Force SMALL)
+  else if (ratio >= 0.7) {
+    targetSize = "SMALL";
+    targetNumber = ratio >= 0.8 ? 2 : 3; 
+    targetColor = targetNumber === 2 ? "RED" : "GREEN";
+    conf = ratio >= 0.8 ? 95 : 85;
+  }
+  else {
+    // Normal market, low confidence
+    conf = 20;
+    targetSize = ratio > 0.5 ? "SMALL" : "BIG";
   }
 
-  const pool = targetSize === "BIG" ? [5, 6, 7, 8, 9] : [0, 1, 2, 3, 4];
-  const last3 = new Set((last10nums || []).slice(0, 3));
-  const candidates = pool.filter((n) => !last3.has(n));
-  const n = candidates.length > 0 ? candidates[Math.floor(candidates.length / 2)] : pool[2];
-  let color = "GREEN";
-  if (n === 0) color = "RED_VIOLET"; else if (n === 5) color = "GREEN_VIOLET"; else if ([2,4,6,8].includes(n)) color = "RED";
-
-  return { number: n, size: targetSize, color, confidence, method: "STREAK_REVERSAL" };
+  return {
+    method: "M02v2_EXP_REVERSAL",
+    number: targetNumber,
+    size: targetSize,
+    color: targetColor,
+    confidence: conf
+  };
 }
+
 module.exports = { predict };

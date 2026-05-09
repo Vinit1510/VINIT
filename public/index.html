@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,139 +8,734 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; min-height: 100vh; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+    }
 
     /* ── Header ─── */
-    .header { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #4f46e5, #7c3aed); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
-    .logo-text { font-weight: 800; font-size: 18px; color: #1e293b; }
-    .header-badge { background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: #475569; font-weight: 600; }
-    .header-actions { display: flex; gap: 8px; }
-    .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.2s; }
-    .btn:hover { background: #f1f5f9; }
-    .btn-danger { border-color: #fca5a5; color: #ef4444; }
-    .btn-danger:hover { background: #ef4444; color: white; }
-    .btn-green { border-color: #86efac; color: #22c55e; }
-    .btn-green:hover { background: #22c55e; color: white; }
+    .header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+
+    .logo-text {
+      font-weight: 800;
+      font-size: 18px;
+      color: #1e293b;
+    }
+
+    .header-badge {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-danger {
+      border-color: #fca5a5;
+      color: #ef4444;
+    }
+
+    .btn-danger:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-green {
+      border-color: #86efac;
+      color: #22c55e;
+    }
+
+    .btn-green:hover {
+      background: #22c55e;
+      color: white;
+    }
 
     /* ── Layout ─── */
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 16px; }
-    @media (max-width: 1024px) { .grid-4 { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-4 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .grid-2,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* ── Cards ─── */
-    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
-    .card-title { font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     /* Highlights for Prediction Card */
-    .card.sure-shot { border: 2px solid #22c55e; background: #f0fdf4; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
-    .card.sure-shot .card-title { color: #16a34a; }
-    .card.cooldown { background: #f8fafc; border: 1px dashed #cbd5e1; }
-    .card.cooldown .card-title { color: #94a3b8; }
+    .card.sure-shot {
+      border: 2px solid #22c55e;
+      background: #f0fdf4;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+    }
+
+    .card.sure-shot .card-title {
+      color: #16a34a;
+    }
+
+    .card.cooldown {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .card.cooldown .card-title {
+      color: #94a3b8;
+    }
 
     /* ── Game Tabs ─── */
-    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
-    .tab { padding: 8px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #64748b; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 13px; transition: all 0.2s; }
-    .tab.active { background: #4f46e5; border-color: #4f46e5; color: white; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #64748b;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: #4f46e5;
+      border-color: #4f46e5;
+      color: white;
+      box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    }
 
     /* ── Engine Header ─── */
-    .engine-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .engine-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
-    .engine-title { font-size: 22px; font-weight: 800; color: #0f172a; }
-    .engine-sub { font-size: 13px; color: #64748b; font-weight: 500; }
-    .source-badge { margin-left: auto; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
-    .source-neural { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
-    .source-statistical { background: #fef08a; color: #a16207; border: 1px solid #fde047; }
+    .engine-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .engine-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    }
+
+    .engine-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .engine-sub {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .source-badge {
+      margin-left: auto;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .source-neural {
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+    }
+
+    .source-statistical {
+      background: #fef08a;
+      color: #a16207;
+      border: 1px solid #fde047;
+    }
 
     /* ── Training Bar ─── */
-    .training-bar { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .training-bar .icon { font-size: 18px; }
-    .training-bar .text { flex: 1; }
-    .training-bar .label { font-size: 13px; font-weight: 700; color: #d97706; }
-    .training-bar .sub { font-size: 11px; color: #64748b; font-weight: 500; }
-    .progress-track { width: 120px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-    .progress-fill.orange { background: linear-gradient(90deg, #f59e0b, #ef4444); }
-    .progress-fill.green { background: linear-gradient(90deg, #22c55e, #06b6d4); }
-    .training-count { font-size: 13px; font-weight: 800; color: #d97706; }
+    .training-bar {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .training-bar .icon {
+      font-size: 18px;
+    }
+
+    .training-bar .text {
+      flex: 1;
+    }
+
+    .training-bar .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #d97706;
+    }
+
+    .training-bar .sub {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .progress-track {
+      width: 120px;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .progress-fill.orange {
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+    }
+
+    .progress-fill.green {
+      background: linear-gradient(90deg, #22c55e, #06b6d4);
+    }
+
+    .training-count {
+      font-size: 13px;
+      font-weight: 800;
+      color: #d97706;
+    }
 
     /* ── Prediction Display ─── */
-    .pred-period { font-size: 16px; font-weight: 800; color: #334155; text-align: center; margin-bottom: 8px; padding: 6px; background: #f1f5f9; border-radius: 6px; letter-spacing: 1px; }
-    .pred-period.sure-shot { background: #dcfce7; color: #166534; }
-    .pred-big { font-size: 56px; font-weight: 800; text-align: center; margin: 4px 0; line-height: 1; }
-    .pred-big.cooldown-text { color: #cbd5e1 !important; }
-    .pred-row { display: flex; justify-content: center; gap: 16px; margin: 16px 0; }
-    .pred-chip { padding: 6px 16px; border-radius: 8px; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; }
-    .chip-big { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
-    .chip-small { background: #fef08a; color: #a16207; border: 1px solid #fde047; }
-    .chip-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-    .chip-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .chip-violet { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
-    .chip-gray { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
-    .confidence-bar { margin-top: 12px; }
-    .conf-track { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-    .conf-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-    .conf-fill.high { background: #22c55e; }
-    .conf-fill.mid { background: #eab308; }
-    .conf-fill.low { background: #ef4444; }
-    .conf-text { font-size: 12px; font-weight: 700; color: #475569; margin-top: 6px; text-align: right; }
-    .method-tag { font-size: 12px; font-weight: 700; color: #6366f1; text-align: center; margin-top: 8px; }
-    .pred-waiting { color: #94a3b8; font-size: 14px; font-weight: 600; text-align: center; padding: 20px; }
-    .sure-shot-alert { text-align: center; font-size: 14px; font-weight: 800; color: #16a34a; margin-top: 8px; animation: pulse 1s infinite; }
+    .pred-period {
+      font-size: 16px;
+      font-weight: 800;
+      color: #334155;
+      text-align: center;
+      margin-bottom: 8px;
+      padding: 6px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+
+    .pred-period.sure-shot {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .pred-big {
+      font-size: 56px;
+      font-weight: 800;
+      text-align: center;
+      margin: 4px 0;
+      line-height: 1;
+    }
+
+    .pred-big.cooldown-text {
+      color: #cbd5e1 !important;
+    }
+
+    .pred-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .pred-chip {
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .chip-big {
+      background: #e0e7ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+    }
+
+    .chip-small {
+      background: #fef08a;
+      color: #a16207;
+      border: 1px solid #fde047;
+    }
+
+    .chip-red {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .chip-green {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .chip-violet {
+      background: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
+    }
+
+    .chip-gray {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+    }
+
+    .confidence-bar {
+      margin-top: 12px;
+    }
+
+    .conf-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .conf-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .conf-fill.high {
+      background: #22c55e;
+    }
+
+    .conf-fill.mid {
+      background: #eab308;
+    }
+
+    .conf-fill.low {
+      background: #ef4444;
+    }
+
+    .conf-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .method-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6366f1;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .pred-waiting {
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .sure-shot-alert {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #16a34a;
+      margin-top: 8px;
+      animation: pulse 1s infinite;
+    }
 
     /* ── Rolling Pulse ─── */
-    .pulse-section { margin-top: 4px; }
-    .pulse-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 12px; display: flex; justify-content: space-between; }
-    .pulse-label .rounds { color: #4f46e5; background: #e0e7ff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-name { font-size: 13px; font-weight: 600; color: #64748b; }
-    .stat-bar { flex: 1; margin: 0 12px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-    .stat-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-    .stat-bar-fill.hot { background: linear-gradient(90deg, #22c55e, #10b981); }
-    .stat-bar-fill.warm { background: linear-gradient(90deg, #facc15, #f59e0b); }
-    .stat-bar-fill.cold { background: linear-gradient(90deg, #ef4444, #f43f5e); }
-    .stat-val { font-size: 13px; font-weight: 800; min-width: 48px; text-align: right; }
+    .pulse-section {
+      margin-top: 4px;
+    }
+
+    .pulse-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .pulse-label .rounds {
+      color: #4f46e5;
+      background: #e0e7ff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .stat-bar {
+      flex: 1;
+      margin: 0 12px;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .stat-bar-fill.hot {
+      background: linear-gradient(90deg, #22c55e, #10b981);
+    }
+
+    .stat-bar-fill.warm {
+      background: linear-gradient(90deg, #facc15, #f59e0b);
+    }
+
+    .stat-bar-fill.cold {
+      background: linear-gradient(90deg, #ef4444, #f43f5e);
+    }
+
+    .stat-val {
+      font-size: 13px;
+      font-weight: 800;
+      min-width: 48px;
+      text-align: right;
+    }
 
     /* ── Table ─── */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 500; }
-    .win { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 11px; border: 1px solid #bbf7d0; }
-    .loss { background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 11px; border: 1px solid #fecaca; }
-    .num-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 800; font-size: 13px; }
-    .num-red { background: #ef4444; color: white; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
-    .num-green { background: #22c55e; color: white; box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3); }
-    .num-violet { background: #a855f7; color: white; box-shadow: 0 2px 4px rgba(168, 85, 247, 0.3); }
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px;
+      color: #475569;
+      font-weight: 700;
+      border-bottom: 2px solid #e2e8f0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #f1f5f9;
+      font-weight: 500;
+    }
+
+    .win {
+      background: #dcfce7;
+      color: #166534;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 11px;
+      border: 1px solid #bbf7d0;
+    }
+
+    .loss {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 11px;
+      border: 1px solid #fecaca;
+    }
+
+    .num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .num-red {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+
+    .num-green {
+      background: #22c55e;
+      color: white;
+      box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+    }
+
+    .num-violet {
+      background: #a855f7;
+      color: white;
+      box-shadow: 0 2px 4px rgba(168, 85, 247, 0.3);
+    }
 
     /* ── Date Picker ─── */
-    .date-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    input[type="date"] { background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 6px 12px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; outline: none; }
-    input[type="date"]:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
+    .date-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    input[type="date"] {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    input[type="date"]:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
 
     /* ── Leaderboard ─── */
-    .lb-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-    .lb-rank { font-size: 14px; font-weight: 800; color: #4f46e5; min-width: 24px; }
-    .lb-name { flex: 1; font-size: 13px; font-weight: 700; color: #334155; }
-    .lb-bar { flex: 2; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-    .lb-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #4f46e5, #9333ea); transition: width 0.5s; }
-    .lb-pct { font-size: 13px; font-weight: 800; color: #0f172a; min-width: 40px; text-align: right; }
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .lb-rank {
+      font-size: 14px;
+      font-weight: 800;
+      color: #4f46e5;
+      min-width: 24px;
+    }
+
+    .lb-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .lb-bar {
+      flex: 2;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .lb-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #4f46e5, #9333ea);
+      transition: width 0.5s;
+    }
+
+    .lb-pct {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      min-width: 40px;
+      text-align: right;
+    }
 
     /* ── Animations ─── */
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .pulsing { animation: pulse 2s infinite; }
-    .fade-in { animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .pulsing {
+      animation: pulse 2s infinite;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
+
 <body>
   <!-- Audio Alert for Sure Shots -->
-  <audio id="sureShotAudio" src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" preload="auto"></audio>
+  <audio id="sureShotAudio"
+    src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+    preload="auto"></audio>
 
   <!-- Header -->
   <div class="header">
@@ -150,12 +746,16 @@
     </div>
     <div class="header-actions">
       <button class="btn btn-green" onclick="downloadCSV()">📥 Export CSV</button>
-      <button class="btn" style="border-color:#f59e0b;color:#d97706;background:#fffbeb;" onclick="downloadRandCSV()">📥 Export Randomizer CSV</button>
-      <button class="btn" style="border-color:#a855f7;color:#9333ea;" onclick="resetWeights()">🧠 Reset AI Memory</button>
+      <button class="btn" style="border-color:#f59e0b;color:#d97706;background:#fffbeb;" onclick="downloadRandCSV()">📥
+        Export Randomizer CSV</button>
+      <button class="btn" style="border-color:#a855f7;color:#9333ea;" onclick="resetWeights()">🧠 Reset AI
+        Memory</button>
       <button class="btn btn-danger" onclick="clearData('1M')">🗑 Clear 1M</button>
       <button class="btn btn-danger" onclick="clearData('30S')">🗑 Clear 30S</button>
-      <button class="btn btn-danger" style="border-color:#f59e0b;color:#d97706;background:#fffbeb;" onclick="clearRandomizer()">🗑 Clear Randomizer</button>
-      <span class="header-badge pulsing" id="refreshTimer" style="color: #4f46e5; background: #e0e7ff; border: none;">⏱ 5s</span>
+      <button class="btn btn-danger" style="border-color:#f59e0b;color:#d97706;background:#fffbeb;"
+        onclick="clearRandomizer()">🗑 Clear Randomizer</button>
+      <span class="header-badge pulsing" id="refreshTimer" style="color: #4f46e5; background: #e0e7ff; border: none;">⏱
+        5s</span>
     </div>
   </div>
 
@@ -177,7 +777,9 @@
         <div class="label" id="trainingLabel">Statistical Mode — AI Training in Progress</div>
         <div class="sub" id="trainingText">Collecting data for Neural activation...</div>
       </div>
-      <div class="progress-track"><div class="progress-fill orange" id="trainingFill" style="width:0%"></div></div>
+      <div class="progress-track">
+        <div class="progress-fill orange" id="trainingFill" style="width:0%"></div>
+      </div>
       <div class="training-count" id="trainingCount">0/100</div>
     </div>
 
@@ -185,54 +787,71 @@
     <div class="tabs">
       <button class="tab active" onclick="switchGame('1M')" id="tab1M">WinGo 1M</button>
       <button class="tab" onclick="switchGame('30S')" id="tab30S">WinGo 30S</button>
-      <button class="tab" onclick="switchToRandomizer()" id="tabRandomizer" style="border-color:#f59e0b;color:#d97706;">🎲 Randomizer</button>
+      <button class="tab" onclick="switchToRandomizer()" id="tabRandomizer"
+        style="border-color:#f59e0b;color:#d97706;">🎲 Randomizer</button>
     </div>
 
     <!-- Randomizer Page (hidden by default) -->
     <div id="randomizerPage" style="display:none;">
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
-        
+
         <!-- ================== PART 1: WinGo 30S ================== -->
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h2 style="font-size:15px; font-weight:800; color:#7c3aed; text-align:center; padding:10px; background:#f5f3ff; border-radius:8px; margin-bottom:0;">🎲 WinGo 30S Randomizer</h2>
-          
+          <h2
+            style="font-size:15px; font-weight:800; color:#7c3aed; text-align:center; padding:10px; background:#f5f3ff; border-radius:8px; margin-bottom:0;">
+            🎲 WinGo 30S Randomizer</h2>
+
           <!-- Standalone All-Time Accuracy Box -->
           <div class="card" style="border-top:4px solid #f59e0b; text-align:center; padding:16px;">
-            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🏆 All-Time Randomizer Accuracy</div>
+            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🏆
+              All-Time Randomizer Accuracy</div>
             <div style="display:flex; justify-content:space-around; align-items:center; margin-top:8px;">
               <div>
                 <div style="font-size:36px; font-weight:900; color:#f59e0b;" id="randSizeWinRate_30S">—%</div>
-                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">Size Win</div>
+                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">
+                  Size Win</div>
               </div>
               <div style="border-left:1px solid #e2e8f0; height:40px;"></div>
               <div>
                 <div style="font-size:36px; font-weight:900; color:#f59e0b;" id="randColorWinRate_30S">—%</div>
-                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">Color Win</div>
+                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">
+                  Color Win</div>
               </div>
             </div>
-            <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-top:12px; border-top:1px solid #f1f5f9; padding-top:8px;" id="randTotalRounds_30S">0 total played rounds</div>
+            <div
+              style="font-size:11px; color:#94a3b8; font-weight:700; margin-top:12px; border-top:1px solid #f1f5f9; padding-top:8px;"
+              id="randTotalRounds_30S">0 total played rounds</div>
           </div>
 
           <!-- Rolling Analytics & Streaks Box -->
           <div class="card" style="border-top:4px solid #10b981; text-align:center; padding:16px;">
-            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:12px;">📊 Rolling Analytics & Streaks</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px;">
+            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:12px;">
+              📊 Rolling Analytics & Streaks</div>
+            <div
+              style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px;">
               <div style="border-right:1px solid #f1f5f9; padding-right:8px;">
-                <div style="font-size:10px; font-weight:700; color:#10b981; text-transform:uppercase;">Last 15 Rounds</div>
-                <div style="font-size:24px; font-weight:900; color:#10b981; margin-top:4px;" id="randSize15_30S">—%</div>
+                <div style="font-size:10px; font-weight:700; color:#10b981; text-transform:uppercase;">Last 15 Rounds
+                </div>
+                <div style="font-size:24px; font-weight:900; color:#10b981; margin-top:4px;" id="randSize15_30S">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Size Win</div>
-                <div style="font-size:18px; font-weight:800; color:#10b981; margin-top:2px;" id="randColor15_30S">—%</div>
+                <div style="font-size:18px; font-weight:800; color:#10b981; margin-top:2px;" id="randColor15_30S">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Color Win</div>
               </div>
               <div style="padding-left:8px;">
-                <div style="font-size:10px; font-weight:700; color:#6366f1; text-transform:uppercase;">Last 30 Rounds</div>
-                <div style="font-size:24px; font-weight:900; color:#6366f1; margin-top:4px;" id="randSize30_30S">—%</div>
+                <div style="font-size:10px; font-weight:700; color:#6366f1; text-transform:uppercase;">Last 30 Rounds
+                </div>
+                <div style="font-size:24px; font-weight:900; color:#6366f1; margin-top:4px;" id="randSize30_30S">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Size Win</div>
-                <div style="font-size:18px; font-weight:800; color:#6366f1; margin-top:2px;" id="randColor30_30S">—%</div>
+                <div style="font-size:18px; font-weight:800; color:#6366f1; margin-top:2px;" id="randColor30_30S">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Color Win</div>
               </div>
             </div>
-            <div style="font-size:11px; font-weight:700; color:#475569; display:flex; justify-content:space-between; align-items:center;">
+            <div
+              style="font-size:11px; font-weight:700; color:#475569; display:flex; justify-content:space-between; align-items:center;">
               <div>🔥 Streak: <span id="randCurrentStreak_30S" style="font-weight:800;">—</span></div>
               <div style="color:#e2e8f0;">|</div>
               <div>🏆 Max Win: <span id="randMaxWinStreak_30S" style="color:#16a34a; font-weight:800;">—</span></div>
@@ -243,16 +862,20 @@
 
           <!-- Active Period Prediction -->
           <div class="card" style="border-top:4px solid #22c55e; padding:16px;">
-            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🎯 Active Target Period</div>
+            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🎯
+              Active Target Period</div>
             <div style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
               <div>
                 <div style="font-size:13px; font-weight:700; color:#334155;" id="randCurrentPeriod_30S">Waiting...</div>
-                <div style="font-size:10px; color:#94a3b8; margin-top:2px;" id="randPostStatus_30S">Database locked</div>
+                <div style="font-size:10px; color:#94a3b8; margin-top:2px;" id="randPostStatus_30S">Database locked
+                </div>
               </div>
               <div style="font-size:36px; font-weight:900; line-height:1;" id="randCurrentNum_30S">?</div>
               <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
-                <span id="randCurrentSize_30S" style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
-                <span id="randCurrentColor_30S" style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
+                <span id="randCurrentSize_30S"
+                  style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
+                <span id="randCurrentColor_30S"
+                  style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
               </div>
             </div>
           </div>
@@ -268,45 +891,59 @@
 
         <!-- ================== PART 2: WinGo 1M ================== -->
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h2 style="font-size:15px; font-weight:800; color:#4f46e5; text-align:center; padding:10px; background:#e0e7ff; border-radius:8px; margin-bottom:0;">🎲 WinGo 1M Randomizer</h2>
-          
+          <h2
+            style="font-size:15px; font-weight:800; color:#4f46e5; text-align:center; padding:10px; background:#e0e7ff; border-radius:8px; margin-bottom:0;">
+            🎲 WinGo 1M Randomizer</h2>
+
           <!-- Standalone All-Time Accuracy Box -->
           <div class="card" style="border-top:4px solid #f59e0b; text-align:center; padding:16px;">
-            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🏆 All-Time Randomizer Accuracy</div>
+            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🏆
+              All-Time Randomizer Accuracy</div>
             <div style="display:flex; justify-content:space-around; align-items:center; margin-top:8px;">
               <div>
                 <div style="font-size:36px; font-weight:900; color:#f59e0b;" id="randSizeWinRate_1M">—%</div>
-                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">Size Win</div>
+                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">
+                  Size Win</div>
               </div>
               <div style="border-left:1px solid #e2e8f0; height:40px;"></div>
               <div>
                 <div style="font-size:36px; font-weight:900; color:#f59e0b;" id="randColorWinRate_1M">—%</div>
-                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">Color Win</div>
+                <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase; margin-top:2px;">
+                  Color Win</div>
               </div>
             </div>
-            <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-top:12px; border-top:1px solid #f1f5f9; padding-top:8px;" id="randTotalRounds_1M">0 total played rounds</div>
+            <div
+              style="font-size:11px; color:#94a3b8; font-weight:700; margin-top:12px; border-top:1px solid #f1f5f9; padding-top:8px;"
+              id="randTotalRounds_1M">0 total played rounds</div>
           </div>
 
           <!-- Rolling Analytics & Streaks Box -->
           <div class="card" style="border-top:4px solid #10b981; text-align:center; padding:16px;">
-            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:12px;">📊 Rolling Analytics & Streaks</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px;">
+            <div style="font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:12px;">
+              📊 Rolling Analytics & Streaks</div>
+            <div
+              style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px;">
               <div style="border-right:1px solid #f1f5f9; padding-right:8px;">
-                <div style="font-size:10px; font-weight:700; color:#10b981; text-transform:uppercase;">Last 15 Rounds</div>
+                <div style="font-size:10px; font-weight:700; color:#10b981; text-transform:uppercase;">Last 15 Rounds
+                </div>
                 <div style="font-size:24px; font-weight:900; color:#10b981; margin-top:4px;" id="randSize15_1M">—%</div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Size Win</div>
-                <div style="font-size:18px; font-weight:800; color:#10b981; margin-top:2px;" id="randColor15_1M">—%</div>
+                <div style="font-size:18px; font-weight:800; color:#10b981; margin-top:2px;" id="randColor15_1M">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Color Win</div>
               </div>
               <div style="padding-left:8px;">
-                <div style="font-size:10px; font-weight:700; color:#6366f1; text-transform:uppercase;">Last 30 Rounds</div>
+                <div style="font-size:10px; font-weight:700; color:#6366f1; text-transform:uppercase;">Last 30 Rounds
+                </div>
                 <div style="font-size:24px; font-weight:900; color:#6366f1; margin-top:4px;" id="randSize30_1M">—%</div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Size Win</div>
-                <div style="font-size:18px; font-weight:800; color:#6366f1; margin-top:2px;" id="randColor30_1M">—%</div>
+                <div style="font-size:18px; font-weight:800; color:#6366f1; margin-top:2px;" id="randColor30_1M">—%
+                </div>
                 <div style="font-size:9px; color:#94a3b8; font-weight:600;">Color Win</div>
               </div>
             </div>
-            <div style="font-size:11px; font-weight:700; color:#475569; display:flex; justify-content:space-between; align-items:center;">
+            <div
+              style="font-size:11px; font-weight:700; color:#475569; display:flex; justify-content:space-between; align-items:center;">
               <div>🔥 Streak: <span id="randCurrentStreak_1M" style="font-weight:800;">—</span></div>
               <div style="color:#e2e8f0;">|</div>
               <div>🏆 Max Win: <span id="randMaxWinStreak_1M" style="color:#16a34a; font-weight:800;">—</span></div>
@@ -317,7 +954,8 @@
 
           <!-- Active Period Prediction -->
           <div class="card" style="border-top:4px solid #22c55e; padding:16px;">
-            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🎯 Active Target Period</div>
+            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;">🎯
+              Active Target Period</div>
             <div style="display:flex; align-items:center; gap:12px; justify-content:space-between;">
               <div>
                 <div style="font-size:13px; font-weight:700; color:#334155;" id="randCurrentPeriod_1M">Waiting...</div>
@@ -325,8 +963,10 @@
               </div>
               <div style="font-size:36px; font-weight:900; line-height:1;" id="randCurrentNum_1M">?</div>
               <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
-                <span id="randCurrentSize_1M" style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
-                <span id="randCurrentColor_1M" style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
+                <span id="randCurrentSize_1M"
+                  style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
+                <span id="randCurrentColor_1M"
+                  style="padding:2px 10px; border-radius:6px; background:#e2e8f0; font-weight:800; font-size:11px;">-</span>
               </div>
             </div>
           </div>
@@ -344,9 +984,12 @@
       <div class="card" style="background:#fffbeb;border:1px solid #fde68a;">
         <div class="card-title" style="color:#92400e;">ℹ️ How This Works</div>
         <p style="font-size:13px;color:#78350f;line-height:1.8;">
-          Every time a <strong>new period starts</strong>, this randomizer auto-generates a random number (0-9) and saves it to the database linked to that period ID.<br>
-          When the actual casino result comes in, the server automatically compares the random prediction vs actual and records WIN or LOSS.<br>
-          <strong>If Cortex V3 beats this randomizer consistently</strong>, the AI is genuinely detecting the casino's algorithm.
+          Every time a <strong>new period starts</strong>, this randomizer auto-generates a random number (0-9) and
+          saves it to the database linked to that period ID.<br>
+          When the actual casino result comes in, the server automatically compares the random prediction vs actual and
+          records WIN or LOSS.<br>
+          <strong>If Cortex V3 beats this randomizer consistently</strong>, the AI is genuinely detecting the casino's
+          algorithm.
         </p>
       </div>
     </div>
@@ -354,67 +997,69 @@
     <!-- Main Game Content (shown by default) -->
     <div id="mainGameContent">
 
-    <!-- Prediction + Rolling Pulse Row -->
-    <div class="grid-4" style="margin-bottom:16px">
-      <!-- Prediction Card -->
-      <div class="card" id="predCard">
-        <div class="card-title">🎯 Active Prediction</div>
-        <div id="predictionArea">
-          <div class="pred-waiting pulsing">⏳ Mining first round...</div>
+      <!-- Prediction + Rolling Pulse Row -->
+      <div class="grid-4" style="margin-bottom:16px">
+        <!-- Prediction Card -->
+        <div class="card" id="predCard">
+          <div class="card-title">🎯 Active Prediction</div>
+          <div id="predictionArea">
+            <div class="pred-waiting pulsing">⏳ Mining first round...</div>
+          </div>
+        </div>
+
+        <!-- Sure Shot Tracker -->
+        <div class="card" style="border-top: 4px solid #22c55e;">
+          <div class="card-title">🌟 Sure Shots (>=65%)</div>
+          <div id="sureShotPulse">
+            <div class="pred-waiting">Waiting for data...</div>
+          </div>
+        </div>
+
+        <!-- Rolling 10 Min -->
+        <div class="card">
+          <div class="card-title">⚡ Last 10 Minutes</div>
+          <div id="rolling10">
+            <div class="pred-waiting">Waiting for data...</div>
+          </div>
+        </div>
+
+        <!-- Rolling 20 Min -->
+        <div class="card">
+          <div class="card-title">📈 Last 20 Minutes</div>
+          <div id="rolling20">
+            <div class="pred-waiting">Waiting for data...</div>
+          </div>
         </div>
       </div>
 
-      <!-- Sure Shot Tracker -->
-      <div class="card" style="border-top: 4px solid #22c55e;">
-        <div class="card-title">🌟 Sure Shots (>=65%)</div>
-        <div id="sureShotPulse">
-          <div class="pred-waiting">Waiting for data...</div>
+      <!-- Recent Results Table -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">📋 Recent Results</div>
+        <div class="table-wrap" id="recentTable">
+          <div class="pred-waiting">No results yet</div>
         </div>
       </div>
 
-      <!-- Rolling 10 Min -->
-      <div class="card">
-        <div class="card-title">⚡ Last 10 Minutes</div>
-        <div id="rolling10">
-          <div class="pred-waiting">Waiting for data...</div>
+      <div class="grid-2">
+        <!-- Method Leaderboard -->
+        <div class="card">
+          <div class="card-title">🏆 AI Engine Leaderboard</div>
+          <div id="leaderboard">
+            <div class="pred-waiting">No accuracy data yet</div>
+          </div>
+        </div>
+
+        <!-- Hourly Analytics -->
+        <div class="card">
+          <div class="date-row">
+            <div class="card-title" style="margin-bottom:0">📊 Hourly Win Rates</div>
+            <input type="date" id="datePicker" onchange="fetchStats()">
+          </div>
+          <div class="table-wrap" id="hourlyTable">
+            <div class="pred-waiting">No hourly data yet</div>
+          </div>
         </div>
       </div>
-
-      <!-- Rolling 20 Min -->
-      <div class="card">
-        <div class="card-title">📈 Last 20 Minutes</div>
-        <div id="rolling20">
-          <div class="pred-waiting">Waiting for data...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Results Table -->
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-title">📋 Recent Results</div>
-      <div class="table-wrap" id="recentTable">
-        <div class="pred-waiting">No results yet</div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <!-- Method Leaderboard -->
-      <div class="card">
-        <div class="card-title">🏆 AI Engine Leaderboard</div>
-        <div id="leaderboard"><div class="pred-waiting">No accuracy data yet</div></div>
-      </div>
-
-      <!-- Hourly Analytics -->
-      <div class="card">
-        <div class="date-row">
-          <div class="card-title" style="margin-bottom:0">📊 Hourly Win Rates</div>
-          <input type="date" id="datePicker" onchange="fetchStats()">
-        </div>
-        <div class="table-wrap" id="hourlyTable">
-          <div class="pred-waiting">No hourly data yet</div>
-        </div>
-      </div>
-    </div>
     </div> <!-- end mainGameContent -->
   </div> <!-- end container -->
 
@@ -436,7 +1081,7 @@
         gainNode.connect(audioCtx.destination);
         oscillator.start();
         setTimeout(() => oscillator.stop(), 200);
-      } catch(e) {}
+      } catch (e) { }
     }
 
     function switchGame(game) {
@@ -536,26 +1181,26 @@
               <th>Size Result</th>
             </tr>
             ${d.recent.map(r => {
-              const isPending = r.size_win === 'PENDING';
-              const sizeWinColor = r.size_win === 'WIN' ? '#16a34a' : r.size_win === 'LOSS' ? '#dc2626' : '#94a3b8';
-              const randSizeBg = r.rand_size === 'BIG' ? '#dbeafe' : '#f3e8ff';
-              const randSizeColor = r.rand_size === 'BIG' ? '#1d4ed8' : '#7c3aed';
-              const actualSizeBg = !r.actual_size ? '#f1f5f9' : r.actual_size === 'BIG' ? '#dbeafe' : '#f3e8ff';
-              const actualSizeColor = !r.actual_size ? '#94a3b8' : r.actual_size === 'BIG' ? '#1d4ed8' : '#7c3aed';
-              return `
+          const isPending = r.size_win === 'PENDING';
+          const sizeWinColor = r.size_win === 'WIN' ? '#16a34a' : r.size_win === 'LOSS' ? '#dc2626' : '#94a3b8';
+          const randSizeBg = r.rand_size === 'BIG' ? '#dbeafe' : '#f3e8ff';
+          const randSizeColor = r.rand_size === 'BIG' ? '#1d4ed8' : '#7c3aed';
+          const actualSizeBg = !r.actual_size ? '#f1f5f9' : r.actual_size === 'BIG' ? '#dbeafe' : '#f3e8ff';
+          const actualSizeColor = !r.actual_size ? '#94a3b8' : r.actual_size === 'BIG' ? '#1d4ed8' : '#7c3aed';
+          return `
                 <tr class="fade-in">
                   <td style="font-weight:700;color:#334155;">${String(r.period_id).slice(-6)}</td>
                   <td style="font-size:20px;font-weight:900;color:#1e293b;">${r.rand_num}</td>
                   <td><span style="padding:3px 10px;border-radius:6px;background:${randSizeBg};color:${randSizeColor};font-weight:800;font-size:12px;">${r.rand_size}</span></td>
-                  <td style="font-size:20px;font-weight:900;color:${isPending?'#94a3b8':'#1e293b'};">${isPending ? '?' : r.actual_num}</td>
+                  <td style="font-size:20px;font-weight:900;color:${isPending ? '#94a3b8' : '#1e293b'};">${isPending ? '?' : r.actual_num}</td>
                   <td><span style="padding:3px 10px;border-radius:6px;background:${actualSizeBg};color:${actualSizeColor};font-weight:800;font-size:12px;">${r.actual_size || '?'}</span></td>
                   <td><span class="${r.size_win === 'WIN' ? 'win' : r.size_win === 'LOSS' ? 'loss' : ''}" style="color:${sizeWinColor};font-weight:800;">${r.size_win}</span></td>
                 </tr>
               `;
-            }).join("")}
+        }).join("")}
           </table>
         `;
-      } catch(e) {
+      } catch (e) {
         console.error("randStats error:", e);
       }
     }
@@ -569,7 +1214,7 @@
     }
 
     function getSizeChip(size, isCooldown) {
-      if (isCooldown) return '<span class="pred-chip chip-gray">' + (size||'WAIT') + '</span>';
+      if (isCooldown) return '<span class="pred-chip chip-gray">' + (size || 'WAIT') + '</span>';
       return size === "BIG"
         ? '<span class="pred-chip chip-big">BIG</span>'
         : '<span class="pred-chip chip-small">SMALL</span>';
@@ -643,7 +1288,7 @@
         document.getElementById("trainingText").textContent = total >= 100
           ? "All AI Models Active: Deep Markov, Bayesian, Neural Net, KNN, Ensemble"
           : `${100 - total} more rounds needed to activate Neural Network models`;
-        
+
         if (total >= 100) {
           const lbl = document.getElementById("trainingLabel");
           lbl.textContent = "Neural Mode — Intelligent Filtering Active";
@@ -653,12 +1298,12 @@
         // Prediction & Highlights
         const predEl = document.getElementById("predictionArea");
         const cardEl = document.getElementById("predCard");
-        
+
         if (d.prediction) {
           const p = d.prediction;
           const isSureShot = p.confidence >= 65;
           const isCooldown = p.confidence === 0;
-          
+
           // Sound Alert for new sure shot
           if (isSureShot && lastPlayedId !== p.targetId) {
             playBeep();
@@ -814,4 +1459,5 @@
     }, 1000);
   </script>
 </body>
+
 </html>

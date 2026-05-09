@@ -21,61 +21,52 @@ const state = {
   "30S": { lastPred: null, lastId: null, lastFetchedAt: null, cooldown: 0 },
 };
 
-// ─── Method Weights (persisted independently for 1M and 30S) ──
-let methodWeights = {
-  "1M": new Map(),
-  "30S": new Map(),
-};
+// ─── Method Weights (persisted in PostgreSQL) ─────────────────
+let methodWeights = new Map();
 
 async function loadWeights() {
   try {
-    const res = await pool.query("SELECT game_type, method, wins, total FROM method_weights");
-    methodWeights = { "1M": new Map(), "30S": new Map() };
+    const res = await pool.query("SELECT method, wins, total FROM method_weights");
+    methodWeights = new Map();
     for (const row of res.rows) {
-      const gt = row.game_type || "1M";
-      if (!methodWeights[gt]) methodWeights[gt] = new Map();
-      methodWeights[gt].set(row.method, { wins: row.wins, total: row.total });
+      methodWeights.set(row.method, { wins: row.wins, total: row.total });
     }
-    console.log("[WEIGHTS] Loaded partitioned weights from database");
+    console.log("[WEIGHTS] Loaded", methodWeights.size, "methods from database");
   } catch (err) { console.log("[WEIGHTS] Starting fresh:", err.message); }
 }
 
-async function saveWeight(gameType, method, stats) {
+async function saveWeight(method, stats) {
   try {
     await pool.query(
-      `INSERT INTO method_weights (game_type, method, wins, total, updated_at)
-       VALUES ($1, $2, $3, $4, NOW())
-       ON CONFLICT (game_type, method) DO UPDATE SET wins = $3, total = $4, updated_at = NOW()`,
-      [gameType, method, stats.wins, stats.total]
+      `INSERT INTO method_weights (method, wins, total, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (method) DO UPDATE SET wins = $2, total = $3, updated_at = NOW()`,
+      [method, stats.wins, stats.total]
     );
   } catch (err) { console.error("[WEIGHTS] Save error:", err.message); }
 }
 
-function getWeightMap(gameType) {
+function getWeightMap() {
   const m = new Map();
-  const weights = methodWeights[gameType] || new Map();
-  for (const [method, stats] of weights.entries()) {
+  for (const [method, stats] of methodWeights.entries()) {
     const acc = stats.total > 0 ? stats.wins / stats.total : 0.5;
     m.set(method, Math.max(0.1, acc));
   }
   return m;
 }
 
-async function updateWeights(gameType, allResults, actualSize, actualNum) {
-  if (!methodWeights[gameType]) methodWeights[gameType] = new Map();
-  const weights = methodWeights[gameType];
+async function updateWeights(allResults, actualSize, actualNum) {
   for (const r of allResults) {
-    if (!weights.has(r.method)) weights.set(r.method, { wins: 0, total: 0 });
-    const stats = weights.get(r.method);
+    if (!methodWeights.has(r.method)) methodWeights.set(r.method, { wins: 0, total: 0 });
+    const stats = methodWeights.get(r.method);
     stats.total++;
     if (r.size === actualSize) stats.wins++;
-    await saveWeight(gameType, r.method, stats);
+    await saveWeight(r.method, stats);
   }
 }
 
-function getMethodAccuracies(gameType) {
-  const weights = methodWeights[gameType] || new Map();
-  return Array.from(weights.entries()).map(([method, stats]) => ({
+function getMethodAccuracies() {
+  return Array.from(methodWeights.entries()).map(([method, stats]) => ({
     method,
     wins: stats.wins,
     total: stats.total,
@@ -121,7 +112,7 @@ async function mineLoop(gameType) {
 
     // Skip if same round
     if (gs.lastId === latest.issueNumber) return;
-    
+
     // Mark this round as processed immediately to prevent infinite duplicate loops
     gs.lastId = latest.issueNumber;
 
@@ -136,14 +127,14 @@ async function mineLoop(gameType) {
       const sizeWin = isSkip ? "SKIP" : (actualSize === gs.lastPred.sz ? "WIN" : "LOSS");
       const colorWin = isSkip ? "SKIP" : (
         actualColor === gs.lastPred.col ||
-        (actualColor.includes("RED") && gs.lastPred.col.includes("RED")) ||
-        (actualColor.includes("GREEN") && gs.lastPred.col.includes("GREEN"))
+          (actualColor.includes("RED") && gs.lastPred.col.includes("RED")) ||
+          (actualColor.includes("GREEN") && gs.lastPred.col.includes("GREEN"))
           ? "WIN" : "LOSS"
       );
 
       // Update method weights in database
       if (gs.lastPred.allMethods) {
-        await updateWeights(gameType, gs.lastPred.allMethods, actualSize, actualNum);
+        await updateWeights(gs.lastPred.allMethods, actualSize, actualNum);
       }
 
       // COOLDOWN TRIGGER: If we just lost a HIGH confidence bet, pattern broke. Go to sleep for 3 rounds.
@@ -161,10 +152,10 @@ async function mineLoop(gameType) {
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
          ON CONFLICT (game_type, period_id) DO NOTHING`,
         [gameType, date, time, hour, latest.issueNumber,
-         actualNum, actualSize, actualColor,
-         gs.lastPred.n, gs.lastPred.sz, gs.lastPred.col,
-         gs.lastPred.method, numWin, sizeWin, colorWin,
-         gs.lastPred.confidence, gs.lastPred.source]
+          actualNum, actualSize, actualColor,
+          gs.lastPred.n, gs.lastPred.sz, gs.lastPred.col,
+          gs.lastPred.method, numWin, sizeWin, colorWin,
+          gs.lastPred.confidence, gs.lastPred.source]
       );
 
       console.log(`[${gameType}] ${latest.issueNumber} | Size:${sizeWin} Num:${numWin} Color:${colorWin} | ${gs.lastPred.method}`);
@@ -181,7 +172,7 @@ async function mineLoop(gameType) {
       final = { number: 5, size: "BIG", color: "GREEN_VIOLET", confidence: 0, method: "COOLDOWN_ACTIVE" };
       allResults = [final];
     } else {
-      const weights = getWeightMap(gameType);
+      const weights = getWeightMap();
       const res = runAllMethods(features, dbHistory, weights);
       allResults = res.allResults;
       final = res.final;
@@ -200,7 +191,7 @@ async function mineLoop(gameType) {
     const randGetColor = (n) => {
       if (n === 0) return "RED_VIOLET";
       if (n === 5) return "GREEN_VIOLET";
-      if ([2,4,6,8].includes(n)) return "RED";
+      if ([2, 4, 6, 8].includes(n)) return "RED";
       return "GREEN";
     };
     const randColor = randGetColor(randNum);
@@ -262,15 +253,15 @@ app.get("/api/stats", async (req, res) => {
     // Hourly analytics
     const hourlyQuery = dateFilter
       ? await pool.query(
-          `SELECT date_ist, hour_ist, size_win, num_win, color_win FROM predictions WHERE game_type = $1 AND date_ist = $2`,
-          [game, dateFilter])
+        `SELECT date_ist, hour_ist, size_win, num_win, color_win FROM predictions WHERE game_type = $1 AND date_ist = $2`,
+        [game, dateFilter])
       : await pool.query(
-          `SELECT date_ist, hour_ist, size_win, num_win, color_win FROM predictions WHERE game_type = $1`,
-          [game]);
+        `SELECT date_ist, hour_ist, size_win, num_win, color_win FROM predictions WHERE game_type = $1`,
+        [game]);
     const hourly = computeHourly(hourlyQuery.rows);
 
     // Method leaderboard
-    const methods = getMethodAccuracies(game);
+    const methods = getMethodAccuracies();
 
     // Engine status
     const engineStatus = {
@@ -289,7 +280,7 @@ app.get("/api/stats", async (req, res) => {
 // Reset AI Memory (Weights) without deleting mined history
 app.post("/api/reset_weights", async (req, res) => {
   await pool.query("DELETE FROM method_weights");
-  methodWeights = { "1M": new Map(), "30S": new Map() };
+  methodWeights.clear();
   res.json({ ok: true, message: "AI Memory Wiped. Learning from scratch." });
 });
 
@@ -298,8 +289,8 @@ app.delete("/api/clear/:mode", async (req, res) => {
   const mode = req.params.mode === "30S" ? "30S" : "1M";
   await pool.query("DELETE FROM predictions WHERE game_type = $1", [mode]);
   await pool.query("DELETE FROM rand_predictions WHERE game_type = $1", [mode]);
-  await pool.query("DELETE FROM method_weights WHERE game_type = $1", [mode]);
-  methodWeights[mode] = new Map();
+  await pool.query("DELETE FROM method_weights");
+  methodWeights.clear();
   state[mode].lastPred = null;
   state[mode].lastId = null;
   res.json({ ok: true, message: `Cleared ${mode} data` });
@@ -355,7 +346,7 @@ app.get("/api/rand_stats", async (req, res) => {
         const randGetColor = (n) => {
           if (n === 0) return "RED_VIOLET";
           if (n === 5) return "GREEN_VIOLET";
-          if ([2,4,6,8].includes(n)) return "RED";
+          if ([2, 4, 6, 8].includes(n)) return "RED";
           return "GREEN";
         };
         const randColor = randGetColor(randNum);
@@ -494,10 +485,10 @@ app.get("/data", async (req, res) => {
     const headers = "GameType,Date_IST,Time_IST,Hour_IST,PeriodID,ActualNum,ActualSize,ActualColor,PredNum,PredSize,PredColor,PatternUsed,NumWin,SizeWin,ColorWin,Confidence,Source";
     const rows = result.rows.map((r) =>
       [r.game_type, r.date_ist, r.time_ist, r.hour_ist, r.period_id,
-       r.actual_num, r.actual_size, r.actual_color,
-       r.pred_num, r.pred_size, r.pred_color,
-       r.pattern_used, r.num_win, r.size_win, r.color_win,
-       r.confidence, r.source].join(",")
+      r.actual_num, r.actual_size, r.actual_color,
+      r.pred_num, r.pred_size, r.pred_color,
+      r.pattern_used, r.num_win, r.size_win, r.color_win,
+      r.confidence, r.source].join(",")
     );
     const csv = [headers, ...rows].join("\n");
     res.setHeader("Content-Type", "text/csv");
@@ -533,10 +524,10 @@ app.get("/rand_data", async (req, res) => {
     const headers = "GameType,PeriodID,RandNum,RandSize,RandColor,ActualNum,ActualSize,ActualColor,SizeWin,ColorWin,CreatedAt";
     const rows = result.rows.map((r) =>
       [r.game_type, r.period_id, r.rand_num, r.rand_size, r.rand_color,
-       r.actual_num !== null ? r.actual_num : "", 
-       r.actual_size || "", 
-       r.actual_color || "",
-       r.size_win, r.color_win, r.created_at ? r.created_at.toISOString() : ""].join(",")
+      r.actual_num !== null ? r.actual_num : "",
+      r.actual_size || "",
+      r.actual_color || "",
+      r.size_win, r.color_win, r.created_at ? r.created_at.toISOString() : ""].join(",")
     );
     const csv = [headers, ...rows].join("\n");
     res.setHeader("Content-Type", "text/csv");
@@ -597,7 +588,7 @@ function computeHourly(rows) {
   const groups = {};
   for (const r of rows) {
     if (r.size_win === "SKIP") continue; // Exclude skipped rounds from hourly average entirely
-    
+
     const key = `${r.date_ist}|${r.hour_ist}`;
     if (!groups[key]) groups[key] = { date: r.date_ist, hour: r.hour_ist, total: 0, sizeW: 0, numW: 0, colorW: 0 };
     groups[key].total++;
