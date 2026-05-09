@@ -14,18 +14,18 @@ function predict(features, history) {
   let conf = 0;
 
   if (streakLen === 1 || streakLen === 2) {
-    // Chop zone danger
-    conf = 35;
+    // Chop zone danger - severely lowered confidence
+    conf = 20;
     targetSize = streakDir === "BIG" ? "SMALL" : "BIG"; // Expect a flip
     targetNumber = targetSize === "BIG" ? 7 : 2;
   } else if (streakLen >= 3 && streakLen <= 5) {
     // Psychological floor established, ride the cluster
-    conf = 75;
+    conf = 65;
     targetSize = streakDir;
     targetNumber = streakDir === "BIG" ? 8 : 1; 
   } else {
     // Overextended, prepare for break
-    conf = 60;
+    conf = 45;
     targetSize = streakDir === "BIG" ? "SMALL" : "BIG";
     targetNumber = targetSize === "BIG" ? 6 : 4;
   }
@@ -34,7 +34,7 @@ function predict(features, history) {
     method: "M11_VOL_CLUSTER",
     number: targetNumber,
     size: targetSize,
-    color: targetColor, // Assign dynamically based on number in production
+    color: targetColor, 
     confidence: conf
   };
 }

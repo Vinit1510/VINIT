@@ -1,10 +1,8 @@
 /**
- * CORTEX V3 - Method 10v2: Master State Controller (Fused with Consensus Accelerator)
- * Evaluates all sub-methods as a dynamic state machine and applies consensus scaling.
+ * CORTEX V3 - Method 10v2: Master State Controller & Consensus Accelerator
+ * Evaluates all sub-methods and acts as a dynamic state machine.
  */
-function predict() { 
-  return { number: 5, size: "BIG", color: "GREEN_VIOLET", confidence: 0, method: "ENSEMBLE" }; 
-}
+function predict() { return { confidence: 0 }; } // Dummy for loader
 
 function ensemble(allResults, features, history, weights) {
   const ratio = features.bigSmallRatio10;
@@ -23,18 +21,17 @@ function ensemble(allResults, features, history, weights) {
   let maxConf = 0;
   let winningMethod = "UNKNOWN";
 
-  // Find the highest confidence based on current state
+  // Step 1: Find the Dominant Base Strategy based on Active Mode
   for (const r of allResults) {
-    if (r.confidence === 0 || r.method === "ENSEMBLE") continue;
-    
     let adjustedConf = r.confidence;
 
+    // Tamed base multipliers slightly to avoid fake high confidence
     if (activeMode === "EMERGENCY_REVERSAL" && r.method === "M02v2_EXP_REVERSAL") {
-      adjustedConf *= 1.5; // Boost Reversal
+      adjustedConf *= 1.3; 
     } else if (activeMode === "TREND_RIDING" && r.method === "M04v2_TREND_GUARDED") {
-      adjustedConf *= 1.2; // Boost Trend
+      adjustedConf *= 1.1; 
     } else if (activeMode === "CLUSTER_MOMENTUM" && r.method === "M11_VOL_CLUSTER") {
-      adjustedConf *= 1.3; // Boost Clustering
+      adjustedConf *= 1.2; 
     }
 
     if (adjustedConf > maxConf) {
@@ -46,31 +43,26 @@ function ensemble(allResults, features, history, weights) {
     }
   }
 
-  // CONSENSUS ACCELERATOR: Boost confidence further when models strongly agree on the winning size!
-  const active = allResults.filter((r) => r.confidence > 0 && r.method !== "ENSEMBLE");
-  const sizeVotes = { BIG: 0, SMALL: 0 };
-  
-  for (const r of active) {
-    const baseWeight = weights.get(r.method) || 1.0;
-    const confWeight = r.confidence / 100;
-    sizeVotes[r.size] += baseWeight * confWeight;
-  }
-  
-  const bigVotes = sizeVotes.BIG;
-  const smallVotes = sizeVotes.SMALL;
-  const totalVotesPower = bigVotes + smallVotes;
-  const voteStrength = totalVotesPower > 0 ? Math.max(bigVotes, smallVotes) / totalVotesPower : 0.5;
-
-  if (voteStrength >= 0.85) {
-    maxConf = Math.round(maxConf * 1.35); // 35% boost for extreme consensus
-  } else if (voteStrength >= 0.75) {
-    maxConf = Math.round(maxConf * 1.20); // 20% boost for high consensus
-  } else if (voteStrength >= 0.65) {
-    maxConf = Math.round(maxConf * 1.10); // 10% boost for moderate consensus
+  // Step 2: The Consensus Accelerator
+  let agreementCount = 0;
+  for (const r of allResults) {
+    if (r.confidence > 0 && r.method !== winningMethod) {
+       if (r.size === finalSize) {
+           agreementCount++;
+       }
+    }
   }
 
-  // Cap confidence at 99
-  maxConf = Math.max(10, Math.min(99, Math.round(maxConf)));
+  // Tamed Consensus Multiplier (Protects against 90% failure rates)
+  let consensusBoost = 1.0;
+  if (agreementCount === 1) consensusBoost = 1.05; // 5% boost
+  if (agreementCount === 2) consensusBoost = 1.15; // 15% boost
+  if (agreementCount >= 3) consensusBoost = 1.25; // 25% boost maximum
+
+  maxConf *= consensusBoost;
+
+  // Hard Cap confidence at 95 to account for casino variance
+  maxConf = Math.min(95, Math.round(maxConf));
 
   return {
     number: finalNum,
